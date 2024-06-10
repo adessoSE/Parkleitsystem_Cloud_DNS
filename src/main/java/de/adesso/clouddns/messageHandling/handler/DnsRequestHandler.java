@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class DnsRequestHandler implements MessageHandler {
@@ -25,16 +26,17 @@ public class DnsRequestHandler implements MessageHandler {
 
     @Override
     public <T extends Message> void handle(T message) {
-        if(supports(message)){
+        if(supports(message)) {
             DnsRequestMessage dnsRequestMessage = (DnsRequestMessage) message;
-            JSONObject response = new JSONObject()
-                    .put("messageType", "dns_response")
-                    .put("response", dns.get(dnsRequestMessage.request()) != null ?
-                            dns.get(dnsRequestMessage.request()) : dnsRequestMessage.request())
-                    .put("request", dnsRequestMessage.request())
-                    .put("messageId", dnsRequestMessage.messageId())
-                    .put("domain", computeDomain(dnsRequestMessage.request()));
-            cloudSender.send(dnsRequestMessage.source(), response);
+            if (dns.containsKey(dnsRequestMessage.request())){
+                JSONObject response = new JSONObject()
+                        .put("messageType", "dns_response")
+                        .put("response", dns.get(dnsRequestMessage.request()))
+                        .put("request", dnsRequestMessage.request())
+                        .put("messageId", dnsRequestMessage.messageId())
+                        .put("domain", computeDomain(dnsRequestMessage.request()));
+                cloudSender.send(dnsRequestMessage.source(), response);
+            }
         }
     }
 

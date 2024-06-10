@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class CloudDnsApplication {
 
     public static void main(String[] args) {
+        System.setProperty("server.port", "60005");
         SpringApplication.run(CloudDnsApplication.class, args);
     }
 
